@@ -2154,6 +2154,11 @@
   optionalDependencies:
     "fsevents" "~2.3.2"
 
+"vue-google-charts@^1.1.0":
+  "integrity" "sha512-wGAgAynIIUKmP5eJUFlx69e8gjIDpyqHlVsvFyrnd2tGZk3a6FI83dRhdssxPyOc9y41+2QEfqUV9SsR+n6s5A=="
+  "resolved" "https://registry.npmjs.org/vue-google-charts/-/vue-google-charts-1.1.0.tgz"
+  "version" "1.1.0"
+
 "vue-router@^4.0.0", "vue-router@^4.0.12":
   "integrity" "sha512-5BP1qXFncVRwgV/XnqzsKApdMjQPqWIpoUBdL1ynz8HyLxIX/UDAx7Ql2BjmA5CXT/p61JfZvkpiFWFpaqcfag=="
   "resolved" "https://registry.npmjs.org/vue-router/-/vue-router-4.1.2.tgz"
@@ -2161,7 +2166,7 @@
   dependencies:
     "@vue/devtools-api" "^6.1.4"
 
-"vue@^3.0.0", "vue@^3.2.0", "vue@^3.2.25", "vue@^3.2.29", "vue@3.2.37":
+"vue@^3.0.0", "vue@^3.0.0-0 || ^2.6.0", "vue@^3.2.0", "vue@^3.2.25", "vue@^3.2.29", "vue@3.2.37":
   "integrity" "sha512-bOKEZxrm8Eh+fveCqS1/NkG/n6aMidsI6hahas7pa0w/l7jkbssJVsRhVDs07IdDq7h9KHswZOgItnwJAgtVtQ=="
   "resolved" "https://registry.npmjs.org/vue/-/vue-3.2.37.tgz"
   "version" "3.2.37"
