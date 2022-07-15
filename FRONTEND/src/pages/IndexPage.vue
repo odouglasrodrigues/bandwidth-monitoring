@@ -62,11 +62,18 @@ export default defineComponent({
   components: { GChart },
   created() {
     this.$socket.on('RunningTest', msg => {
+
+      let hour = new Date().getHours()
+      let minutes = new Date().getMinutes()
+      let seconds = new Date().getSeconds()
+
+      let srtHorario = `${hour}:${minutes}:${seconds}`
+
       this.loading = false
       console.log(msg)
       this.actualDownload = msg.download
       this.actualUpload = msg.upload
-      this.chartData.push(['t', msg.download, msg.upload])
+      this.chartData.push([srtHorario, msg.download, msg.upload])
 
     })
     this.$socket.on('ErrorTest', msg => {
