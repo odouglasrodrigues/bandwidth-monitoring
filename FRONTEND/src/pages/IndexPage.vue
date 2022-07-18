@@ -12,38 +12,63 @@
 
   <div>
     <q-dialog v-model="testArea" persistent transition-show="scale" transition-hide="scale">
-      <div class="q-pa-md q-gutter-sm bg-teal">
+      <div class="items-end bg-white">
 
 
 
         <q-card v-if="loading" class="center"
           style=" display: flex; justify-content: center; align-items: center; flex-direction: column;">
-          <q-spinner-ball align="center" class="bg-teal none" size="6em" />
+          <div class="q-pa-md column justify-center items-center content-center q-gutter-md">
+            <q-spinner-ball align="center" class="bg-white" size="6em" />
+            <div class="buscando" style="font-size: 2em; ">Buscando...</div>
+          </div>
+
 
         </q-card>
 
-        <q-card v-else class="bg-teal text-white">
-          <div class="q-pa-md row items-start q-gutter-md">
-            <q-card class="my-card bg-green text-white">
-              <q-card-section>
-                <div class="text-h6">Download</div>
-                <div class="text-subtitle2">{{ actualDownload }} Mbps</div>
-              </q-card-section>
-            </q-card>
-            <q-card class="my-card bg-blue text-white">
-              <q-card-section>
-                <div class="text-h6">Upload</div>
-                <div class="text-subtitle2">{{ actualUpload }} Mbps</div>
-              </q-card-section>
-            </q-card>
+        <q-card v-else class="bg-teal text-white  q-pa-md row items-start q-gutter-md ">
+
+
+
+          <div class="test-container q-pa-md row items-end q-gutter-md">
+
+            <div class="chartArea full-width row  justify-center items-center content-center shadow-10">
+              <GChart type="AreaChart" :data="chartData" :options="chartOptions" :resizeDebounce="500" />
+            </div>
+
+            <div class="reasultArea row q-gutter-xs justify-evenly">
+              <q-card class="my-card bg-green text-white col-5 shadow-10">
+                <q-card-section>
+                  <div class="text-h6">
+                    <q-icon name="file_download" /> Download
+                  </div>
+                  <div class="text-subtitle3">Atual: {{ actualDownload }} Mbps</div>
+                  <div class="text-subtitle3">Mínimo: {{ minDownload }} Mbps</div>
+                  <div class="text-subtitle3">Máximo: {{ maxDownload }} Mbps</div>
+                  <div class="text-subtitle3">Média: {{ mediaDownload }} Mbps</div>
+                </q-card-section>
+              </q-card>
+              <q-card class="my-card bg-blue text-white col-5 shadow-10 ">
+                <q-card-section>
+                  <div class="text-h6">
+                    <q-icon name="file_upload" /> Upload
+                  </div>
+                  <div class="text-subtitle3">Atual: {{ actualUpload }} Mbps</div>
+                  <div class="text-subtitle3">Mínimo: {{ minUpload }} Mbps</div>
+                  <div class="text-subtitle3">Máximo: {{ maxUpload }} Mbps</div>
+                  <div class="text-subtitle3">Média: {{ mediaUpload }} Mbps</div>
+                </q-card-section>
+              </q-card>
+            </div>
           </div>
-          <GChart type="AreaChart" :data="chartData" :options="chartOptions" :resizeDebounce="600" />
+
 
 
 
 
         </q-card>
         <q-btn flat label="OK" v-close-popup />
+
       </div>
 
     </q-dialog>
@@ -73,7 +98,19 @@ export default defineComponent({
       console.log(msg)
       this.actualDownload = msg.download
       this.actualUpload = msg.upload
+
+      this.minUpload = msg.minUpload
+      this.minDownload = msg.minDownload
+
+      this.maxUpload = msg.maxUpload
+      this.maxDownload = msg.maxDownload
+
+      this.mediaUpload = msg.mediaUpload
+      this.mediaDownload = msg.mediaDownload
+
       this.chartData.push([srtHorario, msg.download, msg.upload])
+
+
 
     })
     this.$socket.on('ErrorTest', msg => {
@@ -84,8 +121,8 @@ export default defineComponent({
       })
     })
     this.$socket.on('FinishTest', msg => {
-      this.actualDownload = null
-      this.actualUpload = null
+      this.actualDownload = 0
+      this.actualUpload = 0
       this.$q.notify({
         type: 'positive',
         message: msg.message
@@ -99,23 +136,41 @@ export default defineComponent({
       timeOfTest: ref('15 Segundos'),
       timesOfTest: ['15 Segundos', '30 Segundos', '45 Segundos'],
       testArea: ref(false),
-      loading: ref(true),
+      loading: ref(false),
       actualUpload: ref(null),
       actualDownload: ref(null),
-      UploadData: ref(null),
-      DownloadData: ref(null),
+      minUpload: ref(null),
+      minDownload: ref(null),
+      maxUpload: ref(null),
+      maxDownload: ref(null),
+      mediaUpload: ref(null),
+      mediaDownload: ref(null)
     }
   },
   data() {
     return {
+
       chartData: [
-        ['Tempo', 'Download', 'Upload']
+        ['Tempo', 'Download', 'Upload'],
+        ['12:22', 112, 60],
+        ['12:21', 122, 66],
+        ['12:24', 119, 69],
       ],
       chartOptions: {
-        title: `Consumo do cliente`,
+        title: `Consumo do Cliente - ${this.text}`,
         legend: { position: 'bottom' },
-        vAxis: { format: '# Mbps' }
-      }
+        vAxis: { format: '# Mbps' },
+        // chartArea: { width: '50%', height: '70%' },
+        width: 500,
+        height: 250,
+        titleTextStyle: {
+          fontSize: 14, // 12, 18 whatever you want (don't specify px)
+          bold: true   // true or false
+        }
+      },
+
+      UploadData: [],
+      DownloadData: []
     }
   },
   methods: {
@@ -138,10 +193,20 @@ export default defineComponent({
       this.UploadData = null
       this.DownloadData = null
 
+      this.chartData = [
+        ['Tempo', 'Download', 'Upload']
+      ]
+      this.UploadData = []
+      this.DownloadData = []
+
+      this.chartOptions.title = `Consumo do Cliente - ${this.text}`
+
       this.$socket.emit('StartTest', { username: this.text, durationTime: durationTime })
     }
-  }
-})
+  },
+}
+
+)
 </script>
 <style>
 .username-input {
@@ -152,6 +217,20 @@ export default defineComponent({
   border-radius: 7px;
   margin-bottom: 2em;
 
+}
+
+
+.reasultArea {
+  height: 100%;
+  width: 100%;
+}
+
+.test-container {
+  background: whitesmoke;
+}
+
+.chartArea {
+  background: yellow;
 }
 </style>
 

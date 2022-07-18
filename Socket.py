@@ -15,6 +15,9 @@ username = sys.argv[1]
 durationTime = int(sys.argv[2])
 clienteId = sys.argv[3]
 
+uploadData = []
+downloadData = []
+
 
 def GetInterfaceName(dados):
     for linha in dados:
@@ -46,8 +49,11 @@ def GetBandwidthUsage(dados):
 
             outputBW = round(int(output)/1000/1000, 2)
 
-            sio.emit('RunningTest', {'id': clienteId,
-                     'upload': inputBW, 'download': outputBW})
+            uploadData.append(inputBW)
+            downloadData.append(outputBW)
+
+            sio.emit('RunningTest', {'id': clienteId, 'upload': inputBW, 'download': outputBW, 'minUpload': min(uploadData), 'minDownload': min(downloadData), 'maxUpload': max(
+                uploadData), 'maxDownload': max(downloadData), 'mediaUpload': round(sum(uploadData)/len(uploadData),2), 'mediaDownload': round(sum(downloadData)/len(downloadData), 2)})
             break
     return
 
@@ -56,8 +62,8 @@ ssh = paramiko.SSHClient()
 
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-ssh.connect('45.189.223.0', username='douglas.rodrigues',
-            password='thmpv77d6f', port=9824)
+ssh.connect('138.36.230.254', username='douglas.rodrigues',
+            password='thmpv77d6f', port=63785)
 
 
 stdin, stdout, stderr = ssh.exec_command(
