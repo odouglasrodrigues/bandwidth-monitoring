@@ -53,4 +53,8 @@ Change the variable ```const socket = io('http://localhost:3000')``` to ```const
 
 ## Images
 
+#### Initial Screen
+![Initial_Screen](images/initial.png?raw=true "Initial")
 
+#### Chart Screen
+![Chart_Screen](images/chart.png?raw=true "Chart")
