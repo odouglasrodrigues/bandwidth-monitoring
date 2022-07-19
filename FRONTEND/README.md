@@ -1,24 +1,32 @@
-# Bandwidth Monitoring (bandwidth-monitoring)
+## Installation
 
-Aplicação para monitorar o uso de banda em clientes PPPoE conectados em BRAS/BNG Juniper
+Clone the repository and enter the FRONTEND folder and run:
 
-## Install the dependencies
+#### Install dependencies
 ```bash
-yarn
-# or
-npm install
+yarn install
 ```
 
-### Start the app in development mode (hot-code reloading, error reporting, etc.)
+#### Run on developer mode
 ```bash
 quasar dev
+#or
+yarn quasar dev
 ```
+#### To build for production
 
-
-### Build the app for production
 ```bash
 quasar build
+#or
+yarn quasar build
 ```
+If you are going to run in production mode, change the backend server host in the ```FRONTEND/src/boot/socket.js``` file.
+Change the variable ```const socket = io('http://localhost:3000')``` to ```const socket = io('http://YOUR-IP-ADDRES-OR-HOSTNAME:3000' )```
 
-### Customize the configuration
-See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-vite/quasar-config-js).
+## Images
+
+#### Initial Screen
+![Initial_Screen](/images/initial.png?raw=true "Initial")
+
+#### Chart Screen
+![Chart_Screen](/images/chart.png?raw=true "Chart")
