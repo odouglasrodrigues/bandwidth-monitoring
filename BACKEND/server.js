@@ -1,43 +1,12 @@
-const express = require('express')
-const cors = require('cors');
-const { exec } = require("child_process");
+/**
+ * Arquivo: server.js
+ * Descrição: Arquivo responsável por toda a configuração e execução da aplicação.
+ */
 
-const app = express()
-const server = require('http').createServer(app)
+const app = require('./src/app');
 
-const io = require('socket.io')(server, {
-    cors: {
-        origins: ['*']
-    }
+const port = process.env.PORT || 5000;
+
+app.listen(port, () => {
+  console.log('Aplicação executando na porta: ', port);
 });
-
-app.use(cors())
-
-let messages = []
-
-io.on('connection', socket => {
-
-    socket.on("StartTest", async (msg) => {
-        const cmd = `python Socket.py ${msg.username} ${msg.durationTime} ${socket.id}`
-        exec(cmd)
-    });
-
-    socket.on("RunningTest", (msg) => {
-        socket.to(msg.id).emit("RunningTest", msg);
-    });
-
-    socket.on('ErrorTest', msg => {
-        socket.to(msg.id).emit("ErrorTest", msg)
-    })
-
-    socket.on('FinishTest', msg => {
-        socket.to(msg.id).emit("FinishTest", msg)
-    })
-
-    socket.on('sendMessage', data => {
-        messages.push(data)
-        socket.broadcast.emit('receivedMessage', data)
-    })
-})
-
-server.listen(3000)

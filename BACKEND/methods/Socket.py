@@ -4,6 +4,7 @@ import sys
 import re
 import socketio
 import json
+from pathlib import Path
 
 sio = socketio.Client()
 username = sys.argv[1]
@@ -13,12 +14,22 @@ uploadData = []
 downloadData = []
 
 
+host = ""
+user = ""
+password = ""
+port = ""
+
+
 def GetInterfaceName(dados, ssh):
     for linha in dados:
         if 'pp0' in linha:
             interface = linha.split(' ')[0]
             return interface
 
+    time.sleep(3)
+    sio.emit('ErrorTest', {'id': clienteId, 'status': 'erro',
+                           'message': 'O Usuário informado não está conectado'})
+    time.sleep(.3)
     sio.emit('ErrorTest', {'id': clienteId, 'status': 'erro',
                            'message': 'O Usuário informado não está conectado'})
     ssh.close()
@@ -47,7 +58,7 @@ def GetBandwidthUsage(dados):
     return
 
 
-def main():
+def main(host, user, password, port):
 
     try:
 
@@ -57,26 +68,37 @@ def main():
         print('Erro ao conectar', Exception)
 
     try:
+
+        try:
+            parent_path = Path(__file__).parent
+            file_path_in = Path(parent_path , 'login.json')
+            with open(file_path_in, "r") as handler:
+                login = json.load(handler)
+                host = login['host']
+                user = login['user']
+                password = login['password']
+                port = login['port']
+
+        except Exception as e:
+            print('Erro ao Abrir o arquivo', e)
+            quit()
+
         
-        with open('loginJuniper.json', "r") as handler:
-            login = json.load(handler)
-            host = login['host']
-            user = login['user']
-            password = login['password']
-            port = login['port']
 
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh.connect(host, username=user, password=password, port=port)
 
+
         stdin, stdout, stderr = ssh.exec_command(
             f'show subscribers user-name {username} | no-more\n'.encode('utf-8'))
         time.sleep(.3)
         return_username = stdout.readlines()
+    
 
         interfaceName = GetInterfaceName(return_username, ssh)
         executando = True
-
+        
         inicial = time.time()
 
         while executando:
@@ -92,6 +114,9 @@ def main():
             if time.time() > inicial+durationTime+4:
                 sio.emit('FinishTest', {'id': clienteId, 'status': 'sucesso',
                                         'message': 'Teste encerrado!'})
+                time.sleep(.3)
+                sio.emit('FinishTest', {'id': clienteId, 'status': 'sucesso',
+                                        'message': 'Teste encerrado!'})
                 executando = False
 
         ssh.close()
@@ -99,8 +124,9 @@ def main():
 
     except Exception as e:
         print(e)
+        exit()
         sys.exit()
 
 
 if __name__ == "__main__":
-    main()
+    main(host, user, password, port)
